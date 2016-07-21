@@ -1,0 +1,113 @@
+
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="row">
+	<div class="col-md-9">
+		<div class="col-md-2 col-md-offset-2 "><h4>已选择权限</h4></div>
+		<div class="col-md-2 col-md-offset-5 "><h4>可选组权限</h4></div>
+	</div>
+</div>
+
+
+
+
+<div class="row">
+
+	<div class="col-sm-9">
+
+		<div class="col-xs-5">
+			<select name="from" id="multiselect" class=" form-control" size="30" multiple="multiple"
+					data-right="#multiselect_to_1" data-right-all="#right_All_1" data-right-selected="#right_Selected_1"
+					data-left-all="#left_All_1" data-right-selected="#left_Selected_1">
+				{% for gper in Selected %}
+				<option value="{{gper.id}}">{{gper.name}}</option>
+				{% endfor %}
+			</select>
+		</div>
+
+		<div class="col-xs-2">
+			<button type="button" id="right_All_1" class="btn btn-block"><i class="glyphicon glyphicon-forward"></i>
+			</button>
+			<button type="button" id="multiselect_rightSelected" class="btn btn-block"><i
+					class="glyphicon glyphicon-chevron-right"></i></button>
+			<button type="button" id="multiselect_leftSelected" class="btn btn-block"><i
+					class="glyphicon glyphicon-chevron-left"></i></button>
+			<button type="button" id="left_All_1" class="btn btn-block"><i class="glyphicon glyphicon-backward"></i>
+			</button>
+		</div>
+
+		<div class="col-xs-5">
+			<select name="to" id="multiselect_to_1" class="form-control" size="30" multiple="multiple">
+				{% for perid,pername in Permission_notin_groups.items %}
+				<option value="{{perid}}">{{pername}}</option>
+				{% endfor %}
+
+			</select>
+		</div>
+
+	</div>
+</div>
+
+
+<br>
+<div class="row">
+	<div class="col-sm-2 col-md-offset-8">
+		<button class="btn btn-info" id="submit_permission" type="submit">提交</button>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+jQuery(document).ready(function($) {
+	$('#multiselect').multiselect();
+	$('#submit_permission').click(function(e) {
+		e.preventDefault();
+		var from = [];
+		var to = [];
+
+		$('select[name=from] option').each(function() {
+			var obj = {};
+			obj.name = $(this).text();
+			obj.value = $(this).val();
+			from.push(obj);
+		});
+
+
+		$('select[name=to] option').each(function() {
+			var obj = {};
+			obj.name = $(this).text();
+			obj.value = $(this).val();
+			to.push(obj);
+		});
+		$.ajax({
+			url: '{% url 'users_permission_managers' groupid %}',
+			method: 'POST',
+			dataType: 'json',
+			data: {
+				from: JSON.stringify(from),
+				to: JSON.stringify(to),
+				csrfmiddlewaretoken: '{{ csrf_token }}'
+			},
+			success: function(data) {
+
+				var msginfo = data.msginfo;
+				toastr.success(msginfo);
+				setTimeout(function() {
+					location.href = '/users/permissions/list/1';
+				},1000);
+			},
+			error: function() {
+				alert('网络异常！');
+			}
+		});
+	})
+});
+
+</script>
+
+{% endblock %}
+

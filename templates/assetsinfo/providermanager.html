@@ -1,0 +1,329 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-provideradd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加提供商</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-sm-9">
+
+    <div class="panel panel-default">
+        <strong>提供商列表</strong>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+
+                <th>提供商</th>
+                <th>地址</th>
+                <th>联系人</th>
+                <th>联系方式</th>
+                <th>传真</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for pro in Provider_data %}
+            <tr>
+                <td>{{ pro.provider_name}}</td>
+                <td>{{ pro.address}}</td>
+                <td>{{ pro.contacts}}</td>
+                <td>{{ pro.phone}}</td>
+                <td>{{ pro.Fax}}</td>
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="PostProviderEdit('{{ pro.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{pro.id}}')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+       function PostProviderAdd(){
+               $("form#provideradd").validate({
+                        rules: {
+                            provider_name: {
+                                required: true
+                            },
+                        },
+                        messages: {
+                            provider_name: {
+                                required: '请输入提供商名称'
+                            },
+                        },
+                        // 添加用户信息
+                        submitHandler: function()
+                        {
+                             $.ajax({
+                                url: "{% url "provider_list" %}",
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                     provider_name: $("input[name='provider_name']").val(),
+                                     provider_address: $("input[name='provider_address']").val(),
+                                     provider_contacts: $("input[name='provider_contacts']").val(),
+                                     provider_phone: $("input[name='provider_phone']").val(),
+                                     provider_fax: $("input[name='provider_fax']").val(),
+                                     csrfmiddlewaretoken: '{{ csrf_token }}',
+                                },
+
+                                success: function(resp)
+                                {
+                                    var msginfo = resp.msginfo;
+                                    var msgerror = resp.msgerror;
+                                    if (msginfo){
+                                        toastr.success(msginfo);
+                                        //关闭模态框
+                                        $('#modal-provideradd').modal('hide');
+                                        setTimeout(function() {
+                                            location.href = location.href;
+                                        },1000);
+                                    }
+                                    else{
+                                        $('#modal-provideradd').modal('hide');
+                                        toastr.error(msgerror);
+                                    }
+                                },
+                                error: function() {
+                                    toastr.error("网络异常");
+                                }
+                                });
+                        }
+               });
+        }
+</script>
+
+<script type="text/javascript">
+    function PostProviderEdit(pid){
+        $(function(){
+            $.ajax({
+                        url: "/assets/provider/edit/" + pid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+
+                                toastr.error(msgerror);
+                          }
+                          else{
+                              document.getElementById('provider_name_edit').value = resp.name;
+                              document.getElementById('provider_address_edit').value = resp.address;
+                              document.getElementById('provider_contacts_edit').value = resp.contacts;
+                              document.getElementById('provider_phone_edit').value = resp.phone;
+                              document.getElementById('provider_fax_edit').value = resp.Fax;
+                              document.getElementById('provider_name_edit').setAttribute('pid',resp.tag);
+                              $('#modal-provideredit').modal('show');
+                          }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function provider_edit_info(){
+        var id = document.getElementById('provider_name_edit').attributes['pid'].value;
+        $.ajax({
+                url: "/assets/provider/edit/" + id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    provider_name_edit:  document.getElementById('provider_name_edit').value,
+                    provider_address_edit:  document.getElementById('provider_address_edit').value,
+                    provider_contacts_edit:  document.getElementById('provider_contacts_edit').value,
+                    provider_phone_edit:  document.getElementById('provider_phone_edit').value,
+                    provider_fax_edit:  document.getElementById('provider_fax_edit').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-provideredit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                         toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+
+
+<!-- 删除信息确认-->
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/assets/provider/del/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+{% endblock %}
+
+
+
+{% block modal-content %}
+    <div class="modal fade" id="modal-provideradd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" role="form" id="provideradd" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">提供商添加</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">提供商</label>
+
+                                    <input type="text" class="form-control" id="provider_name" name="provider_name">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">地址</label>
+
+                                    <input type="text" class="form-control" id="provider_address" name="provider_address">
+                                </div>
+
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系人</label>
+
+                                    <input type="text" class="form-control" id="provider_contacts" name="provider_contacts">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系方式</label>
+                                    <input type="text" class="form-control"  id="provider_phone" name="provider_phone">
+                                </div>
+
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">传真</label>
+
+                                    <input type="text" class="form-control" id="provider_fax" name="provider_fax">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-info" onclick="PostProviderAdd()">添加</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-provideredit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">提供商修改</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">提供商</label>
+
+                                    <input type="text" class="form-control" id="provider_name_edit" name="provider_idcname_edit">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">地址</label>
+
+                                    <input type="text" class="form-control" id="provider_address_edit" name="provider_address_edit">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系人</label>
+
+                                    <input type="text" class="form-control" id="provider_contacts_edit" name="provider_contacts_edit">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系方式</label>
+                                    <input type="text" class="form-control" id="provider_phone_edit" name="provider_phone_edit">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">传真</label>
+                                    <input type="text" class="form-control" id="provider_fax_edit" name="provider_fax_edit">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-info" onclick="provider_edit_info()">添加</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}

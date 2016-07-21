@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-groupadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加用户组</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-sm-9">
+
+    <div class="panel panel-default">
+        <strong>用户组列表</strong>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+
+                <th>组名</th>
+                <th>成员数</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for groups in Groupdata %}
+            <tr>
+
+                <td>{{ groups.name}}</td>
+                {% for gname,gcount in Gdirs.iteritems %}
+                {% if gname == groups.name %}
+                <td>{{ gcount }}</td>
+                {%endif%}
+                {%endfor%}
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="groupedit('{{ groups.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{groups.id}}')">删除</a>
+                    <a  class="btn btn-xs btn-warning" href="{% url 'users_group_manager' groups.id %}">管理组成员</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+<div class="col-sm-8">
+    <ul class="pagination">
+        {{pages}}
+    </ul>
+</div>
+
+
+
+<script type="text/javascript">
+       $(function(){
+            $("#postgroupadd").click(function() {
+                $.ajax({
+                        url: "{% url "users_group_add" %}",
+                        method: 'POST',
+                        dataType: 'json',
+                        data: {
+                            groupname: $("input[name='groupname']").val(),
+                            csrfmiddlewaretoken: '{{ csrf_token }}',
+                        },
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                //关闭模态框
+                                $('#modal-groupadd').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-groupadd').modal('hide');
+                            }
+                        },
+                        error: function() {
+
+				            toastr.error("网络异常");
+			            }
+                });
+
+
+            });
+
+            $(document).on('click','.delete',function() {
+                 var id = $(this).attr("name");
+                 $.ajax({
+                    url: "/users/groups/del/" + id,
+                    method: "GET",
+                    dataType: 'json',
+
+                    success: function(resp)
+                    {
+                        var msginfo = resp.msginfo;
+                        toastr.success(msginfo);
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    },
+                    error: function() {
+                        toastr.error("网络异常");
+                    }
+
+                 });
+            })
+
+        });
+
+</script>
+
+<script type="text/javascript">
+    function groupedit(groupid){
+        $(function(){
+            $.ajax({
+                        url: "/users/groups/edit/" + groupid,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+                                toastr.error(msgerror);
+                          }else{
+                              document.getElementById('group_edit_name').value = resp.groupname;
+                              document.getElementById('group_edit_name').setAttribute('groupid',resp.tag);
+                              $('#modal-groupedit').modal('show');
+                          }
+
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+
+
+
+
+
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function edit_info(){
+        var id = document.getElementById('group_edit_name').attributes['groupid'].value;
+
+        $.ajax({
+                url: "/users/groups/edit/" + id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    groupname:  document.getElementById('group_edit_name').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-groupedit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                        toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+
+<!-- 删除信息确认-->
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/users/groups/del/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                //组删除错误提示
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+
+{% endblock %}
+
+
+{% block modal-content %}
+
+   <div class="modal fade" id="modal-groupadd">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">用户组添加</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">组名</label>
+
+                            <input type="text" class="form-control" id="groupname" name="groupname"
+                                   placeholder="groupname">
+                        </div>
+
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="postgroupadd">添加</button>
+            </div>
+        </div>
+    </div>
+</div>
+   <div class="modal fade" id="modal-groupedit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">用户组修改</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">组名</label>
+                            <input type="text" class="form-control" id="group_edit_name" name="group_edit_name" value=""
+                                   placeholder="groupname">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="postgroupedit" onclick="edit_info()">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

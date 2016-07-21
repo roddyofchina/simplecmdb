@@ -1,0 +1,480 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-xs-6 col-sm-4 col-md-4">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-employeeadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加人员</button>
+        </a>
+
+            <button class="btn btn-primary" type="button" onclick="AllDelete()">批量删除</button>
+
+        <a href="#">
+            <button class="btn btn-secondary" type="button">人员导出</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-md-8 ">
+    <form method="POST" action="{% url 'employee_list' 1 %}">
+        <div class="col-md-4 col-md-offset-7">
+            <input type="text" class="form-control" id="search" placeholder="Search" name="search">
+        </div>
+        {% csrf_token %}
+        <button type="submit" class="btn btn-info"> 搜索</button
+    </form>
+</div>
+
+<div class="col-md-12">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">员工列表</h3>
+
+            <div class="panel-options">
+                <a href="#" data-toggle="panel">
+                    <span class="collapse-icon">&ndash;</span>
+                    <span class="expand-icon">+</span>
+                </a>
+                <a href="#" data-toggle="remove">
+                    &times;
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <table class="table table-bordered table-striped" id="example-2">
+                <thead>
+                <tr>
+                    <th class="no-sorting">
+                        <input type="checkbox" class="cbr">
+                    </th>
+                    <th>员工姓名</th>
+                    <th>员工编号</th>
+                    <th>姓别</th>
+                    <th>联系方式</th>
+                    <th>邮箱</th>
+                    <th>年龄</th>
+                    <th>状态</th>
+                    <th>生日</th>
+                    <th>部门</th>
+                    <th>家庭地址</th>
+                    <th>毕业院校</th>
+                    <th>职位</th>
+
+                    <th>入职时间</th>
+
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody class="middle-align">
+                {% for users in Employees%}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="cbr" value="{{ users.id}}">
+                    </td>
+                    <td>{{ users.name}}</td>
+                    <td>{{ users.number}}</td>
+                    <td>{{ users.get_sex_display }}</td>
+                    <td>{{ users.contact }}</td>
+                    <td>{{ users.email }}</td>
+                    <td>{{ users.age }}</td>
+                    <td>{{ users.get_status_display }}</td>
+                    <td>{{ users.birthday|date:"Y-m-d" }}</td>
+                    <td>{{ users.dept }}</td>
+                    <td>{{ users.family_address }}</td>
+                    <td>{{ users.universit }}</td>
+                    <td>{{ users.jobtitle }}</td>
+
+                    <td>{{ users.EntryTime|date:"Y-m-d" }}</td>
+
+                    <td>
+                        <a href="{% url 'employee_edit' users.id %}" class="btn btn-secondary btn-sm btn-icon icon-left">
+                            修改
+                        </a>
+                        <a class="btn btn-danger btn-sm btn-icon icon-left" onclick="clickurl('{{users.id}}')">
+                            删除
+                        </a>
+                        <a href="{% url 'employee_detail' users.id %}" class="btn btn-info btn-sm btn-icon icon-left">
+                            详细
+                        </a>
+                    </td>
+                </tr>
+                {% endfor%}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-8">
+    {{pages}}
+</div>
+
+<script type="text/javascript">
+    function clickurl(sid){
+       $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/employee/emp/del/" + sid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+    var isAllChecked = false;
+    $('.no-sorting').click(function() {
+
+        if(isAllChecked) {
+            $('.cbr-replaced').removeClass('cbr-checked');
+            $('.cbr-replaced input[type=checkbox]').attr("checked",false);
+        } else {
+            $('.cbr-replaced').addClass('cbr-checked');
+            $('.cbr-replaced input[type=checkbox]').attr("checked","checked");
+        }
+        isAllChecked = !isAllChecked;
+    })
+
+    //批量删除资产信息,在此感谢前端同学的帮助
+    function AllDelete(){
+                $('#modal-delinfo').modal('show');
+                $('#delete_this').click(function(){
+                    var getdata = document.getElementsByClassName('cbr-checked');
+                    var datalist = [];
+                    for(var i=0;i<getdata.length;i++){
+                        var values = getdata[i].firstChild.firstChild.getAttribute('value');
+                        if (values != 0 && values ){
+                               datalist.push(getdata[i].firstChild.firstChild.getAttribute('value'));
+                        }
+                    }
+
+                    //判断是否选择了资产
+                    if (datalist.length  == 0){
+                            toastr.error("没有选择资产信息");
+                            $('#modal-delinfo').modal('hide');
+
+                    }else{
+                        $.ajax({
+                            url: "/employee/emp/del/1",
+                            method: "POST",
+
+                            data:{
+                                'Checked': JSON.stringify(datalist),
+                                 csrfmiddlewaretoken: '{{ csrf_token }}',
+                            },
+                            dataType: 'json',
+                            success: function(resp){
+                                var msginfo = resp.msginfo;
+                                var msgerror = resp.msgerror;
+                                if (msginfo){
+                                    toastr.success(msginfo);
+                                    $('#modal-delinfo').modal('hide');
+                                    setTimeout(function() {
+                                        location.href = location.href;
+                                    },1000);
+                                }
+                                else{
+                                    toastr.error(msgerror);
+                                    $('#modal-delinfo').modal('hide');
+                                    setTimeout(function() {
+                                        location.href = location.href;
+                                    },3000);
+                                }
+                            },
+
+                            error:function(){
+                                toastr.error("网络异常");
+                            },
+                        })
+                    }
+                })
+    }
+</script>
+
+<script type="text/javascript">
+    function Employee_add(e){
+        $("form#Employeeadd").validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    number: {
+                        required: true,
+
+                    },
+                    email: {
+                        required: true
+                    },
+                    phone: {
+                        required: true
+                    },
+                    age: {
+                        required: true
+                    },
+                },
+                messages: {
+                    name: {
+                        required: '请输入员工姓名'
+                    },
+                    number: {
+                        required: '请输入工号',
+                    },
+                    email: {
+                        required: '请输入邮箱地址',
+                        email: '请输入正确的邮箱地址',
+                    },
+                    phone: {
+                        required: '请输入联系方式',
+                    },
+
+                    age: {
+                        required: '请输入年龄',
+                    },
+                },
+
+                // 添加用户信息
+                submitHandler: function(form)
+                {
+                  e.preventDefault();
+                  var serializeData = $('#Employeeadd').serialize();
+                  $('#Employeeadd').ajaxSubmit({
+                       type:'POST',
+                       url: "{% url 'employee_add' %}",
+                       dataType: 'json',
+                       data: serializeData,
+                       contentType: false,
+                       cache: false,
+                       processData:false,
+                       beforeSubmit: function() {
+                            //上传图片之前的处理
+                       },
+                       uploadProgress: function (event, position, total, percentComplete){
+                           //在这里控制进度条
+                       },
+                       success:function(resp){
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-employeeadd').modal('hide');
+                                setTimeout(function() {
+                                    location.href = '/employee/users/1';
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-employeeadd').modal('hide');
+                            }
+                       },
+                       error:function(data){
+                           toastr.error("网络异常");;
+                       }
+                   });
+
+                }
+        });
+    }
+</script>
+
+
+
+
+{% endblock %}
+
+{% block modal-content %}
+
+<div class="modal fade" id="modal-employeeadd">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" role="form" id="Employeeadd" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">员工信息添加</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">员工姓名*</label>
+
+                                <input type="text" class="form-control" id="field-1" name="name">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="field-2" class="control-label">工号*</label>
+                                <input type="text" class="form-control" id="field-2" name="number">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="email" class="control-label">Email*</label>
+                                <input type="email" class="form-control" name="email">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="field-3" class="control-label">联系方式*</label>
+                                <input type="text" class="form-control" name="phone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="field-5" class="control-label">姓别</label>
+
+                                <p>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="sex" value="1" checked>
+                                        男
+                                    </label>
+                                    <label class="radio-inline">
+                                        <input type="radio" name="sex" value="2">
+                                        女
+                                    </label>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="birthday" class="control-label">出生日期</label>
+                                <input type="text" class="form-control " name="birthday">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label class="control-label">入职时间</label>
+                                <input type="text" class="form-control " name="entry_time">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-2">
+
+                            <div class="form-group">
+                                <label class="control-label">年龄*</label>
+                                <input type="text" class="form-control" name="age">
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="field-5" class="control-label">状态</label>
+                                <select class="form-control" name="status">
+                                    {% for status in EmployeeStatus %}
+                                    <option value="{{status.0}}">{{status.1}}</option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+
+                            <div class="form-group">
+                                <label for="field-6" class="control-label">部门</label>
+
+                                <select class="form-control" name="dept">
+                                    {% for dept in Depts_Data%}
+                                    <option value="{{dept.id}}">{{dept}}</option>
+                                    {% endfor%}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="field-6" class="control-label">职位</label>
+                                <select class="form-control" name="Jobtitle">
+                                    {% for Job in JobTitile %}
+                                    <option value="{{Job.id}}">{{Job}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="field-6" class="control-label">毕业院校</label>
+
+                                <input type="text" class="form-control" name="universit">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="form-group">
+                                <label for="field-6" class="control-label">家庭住址</label>
+
+                                <input type="text" class="form-control" name="family_address">
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <label for="field-3" class="control-label">离职时间</label>
+                                <input type="text" class="form-control " name="exitTime">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label for="field-7" class="control-label">员工照片</label>
+                                <input type="file" class="form-control" name="photo">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">关闭</button>
+                    <button type="submit" class="btn btn-info" onclick="Employee_add(event)">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

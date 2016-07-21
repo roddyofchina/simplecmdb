@@ -1,0 +1,279 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-businessadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加业务</button>
+        </a>
+    </p>
+</div>
+
+
+<div class="col-sm-6">
+
+    <div class="panel panel-default">
+        <strong>业务列表</strong>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+
+                <th>业务</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for bus in Business_data %}
+            <tr>
+                <td>{{ bus.name}}</td>
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="business_edit('{{ bus.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{bus.id}}')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+
+       function Bus_add(e){
+               $("form#bus_add").validate({
+                        rules: {
+                            businessname: {
+                                required: true
+                            },
+                        },
+
+                        messages: {
+                            businessname: {
+                                required: '请输入业务名称'
+                            },
+                        },
+
+                        // 添加用户信息
+                        submitHandler: function(form)
+                        {
+                               e.preventDefault();
+                               var serializeData = $('#bus_add').serialize();
+                               $('#bus_add').ajaxSubmit({
+                                       type:'POST',
+                                       url: "{% url 'business_list' %}",
+                                       dataType: 'json',
+                                       data: serializeData,
+                                       contentType: false,
+                                       cache: false,
+                                       processData:false,
+                                        success: function(resp)
+                                        {
+                                            var msginfo = resp.msginfo;
+                                            var msgerror = resp.msgerror;
+                                            if (msginfo){
+                                                toastr.success(msginfo);
+                                                //关闭模态框
+                                                $('#modal-businessadd').modal('hide');
+                                                setTimeout(function() {
+                                                    location.href = location.href;
+                                                },1000);
+                                            }
+                                            else{
+                                                $('#modal-businessadd').modal('hide');
+                                                toastr.error(msgerror);
+                                            }
+                                        },
+                                        error: function() {
+                                            toastr.error("网络异常");
+                                        }
+                                });
+
+                        }
+               });
+        }
+
+</script>
+
+<script type="text/javascript">
+    function business_edit(busid){
+        $(function(){
+            $.ajax({
+                        url: "/assets/business/edit/" + busid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+                                toastr.error(msgerror);
+                          }
+                          else{
+                              document.getElementById('business_edit_name').value = resp.busname;
+                              document.getElementById('business_edit_name').setAttribute('busid',resp.tag);
+                              $('#modal-businessedit').modal('show');
+                          }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function business_edit_name(){
+        var id = document.getElementById('business_edit_name').attributes['busid'].value;
+        $.ajax({
+                url: "/assets/business/edit/" + id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    busname:  document.getElementById('business_edit_name').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-businessedit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                         toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+
+<!-- 删除信息确认-->
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/assets/business/del/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+
+
+{% endblock %}
+
+
+{% block modal-content %}
+    <div class="modal fade" id="modal-businessadd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form method="post" role="form" id="bus_add" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">业务添加</h4>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">业务</label>
+
+                                    <input type="text" class="form-control" id="businessname" name="businessname"
+                                           required="required">
+                                </div>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-info" onclick="Bus_add(event)">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-businessedit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">业务修改</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">业务名</label>
+                                <input type="text" class="form-control" id="business_edit_name" name="business_edit_name" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-info" id="postgroupedit" onclick="business_edit_name()">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

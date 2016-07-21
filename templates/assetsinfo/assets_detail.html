@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+<link rel="stylesheet" href="/static/assets/css/site.css">
+
+
+    <div class="col-md-8">
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                资产详细信息
+            </div>
+            <div class="panel-body">
+                <table class="table table-bordered table-striped">
+                    <tr>
+                        <td >资产名:</td>
+                        <td>{{details_data.Assets_name}}</td>
+                        <td >资产编号:</td>
+                        <td>{{details_data.device_number}}</td>
+                        <td >资产类型:</td>
+                        <td>{{details_data.device_type}}</td>
+                    </tr>
+                    <tr>
+                        <td >购买方式:</td>
+                        <td>{{details_data.get_buy_type_display}}</td>
+                        <td>资产价格:</td>
+                        <td>{{details_data.price}}</td>
+                        <td>资产状态:</td>
+                        <td>{{details_data.get_status_display}}</td>
+
+                    </tr>
+
+                    <tr>
+                        <td >购买时间:</td>
+                        <td>{{details_data.buy_time}}</td>
+                        <td>开始使用时间:</td>
+                        <td>{{details_data.suse_time}}</td>
+                        <td>截至使用时间:</td>
+                        <td>{{details_data.euse_time}}</td>
+                    </tr>
+                    <tr>
+                        <td >保修期:</td>
+                        <td>{{details_data.Warranty}}</td>
+                        <td>负责人:</td>
+                        <td>{{details_data.principal}}</td>
+                        <td>使用人:</td>
+                        <td>{{details_data.Employee}}</td>
+                    </tr>
+                    <tr>
+                        <td>IDC:</td>
+                        <td>{{details_data.IDC}}</td>
+                        <td>业务:</td>
+                        <td>{{details_data.business}}</td>
+                        <td rowspan="2">备注</td>
+                    </tr>
+                    <tr>
+                        <td>提供商</td>
+                        <td>{{details_data.provider}}</td>
+                        <td>管理员:</td>
+                        <td>
+                            {% for u in SelectAdmin %}
+                                    {{u}}
+                                    &nbsp;
+                            {% endfor %}
+                        </td>
+                        <td rowspan="2">{{details_data.description}}</td>
+                    </tr>
+                </table>
+
+            </div>
+
+               <div class="row">
+                    <div class="form-group">
+                        <div class="col-md-1 col-md-offset-8">
+                        <button type="button" class="btn btn-success" onclick="back()">返回</button>
+                            </div>
+                        </div>
+                   </div>
+        </div>
+    </div>
+
+
+<script type="text/javascript">
+    function back(){
+        history.go(-1);
+    }
+
+</script>
+
+{% endblock %}

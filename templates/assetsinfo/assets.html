@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+<div class="col-xs-6 col-sm-4 col-md-4">
+    <p>
+        <a href="{% url 'assets_add' %}">
+            <button class="btn btn-info" type="button">资产录入</button>
+        </a>
+
+            <button class="btn btn-primary" type="button" onclick="AllDelete()">资产删除</button>
+
+        <a href="#">
+            <button class="btn btn-secondary" type="button">资产导出</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-xs-12 col-sm-6 col-md-8 ">
+    <form method="POST" action="{% url 'assets_list' 1 %}">
+        <div class="col-md-4 col-md-offset-7">
+            <input type="text" class="form-control" id="search" placeholder="Search" name="search">
+        </div>
+        {% csrf_token %}
+        <button type="submit" class="btn btn-info"> 搜索</button
+    </form>
+</div>
+
+<div class="col-md-12">
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">资产列表</h3>
+
+            <div class="panel-options">
+                <a href="#" data-toggle="panel">
+                    <span class="collapse-icon">&ndash;</span>
+                    <span class="expand-icon">+</span>
+                </a>
+                <a href="#" data-toggle="remove">
+                    &times;
+                </a>
+            </div>
+        </div>
+        <div class="panel-body">
+
+            <table class="table table-bordered table-striped" id="example-2">
+                <thead>
+                <tr>
+                    <th class="no-sorting">
+                        <input type="checkbox" class="cbr">
+                    </th>
+                    <th>资产名称</th>
+                    <th>资产编号</th>
+                    <th>资产状态</th>
+                    <th>资产类型</th>
+                    <th>购入时间</th>
+                    <th>购入方式</th>
+                    <th>购入价格</th>
+                    <th>使用人</th>
+                    <th>提供商</th>
+                    <th>使用时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <tbody class="middle-align">
+                {% for ass in AssetsData%}
+                <tr>
+                    <td>
+                        <input type="checkbox" class="cbr" value="{{ ass.id}}">
+                    </td>
+                    <td><a href="{% url 'assets_detail' ass.id %}"> {{ ass.Assets_name}}</a></td>
+                    <td><a href="{% url 'assets_detail' ass.id %}"> {{ ass.device_number}}</a></td>
+                    <td>{{ ass.get_status_display}}</td>
+                    <td>{{ ass.device_type}}</td>
+                    <td>{{ ass.buy_time}}</td>
+                    <td>{{ ass.get_buy_type_display}}</td>
+                    <td>{{ ass.price}}</td>
+                    {% if ass.Employee == None %}
+                    <td></td>
+                    {% else %}
+                    <td>{{ ass.Employee}}</td>
+                    {% endif %}
+                    <td>{{ ass.provider}}</td>
+                    <td>{{ ass.suse_time }}</td>
+                    <td>
+                        <a href="{% url 'assets_edit' ass.id %}" class="btn btn-secondary btn-sm btn-icon icon-left">
+                            修改
+                        </a>
+                        <a class="btn btn-danger btn-sm btn-icon icon-left" onclick="clickurl('{{ass.id}}')">
+                            删除
+                        </a>
+                        <a href="{% url 'assets_detail' ass.id %}" class="btn btn-info btn-sm btn-icon icon-left">
+                            详细
+                        </a>
+                    </td>
+                </tr>
+                {% endfor%}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-8">
+
+    {{pages}}
+</div>
+
+<script type="text/javascript">
+    function clickurl(sid){
+       $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/assets/del/" + sid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+    var isAllChecked = false;
+    $('.no-sorting').click(function() {
+
+        if(isAllChecked) {
+            $('.cbr-replaced').removeClass('cbr-checked');
+            $('.cbr-replaced input[type=checkbox]').attr("checked",false);
+        } else {
+            $('.cbr-replaced').addClass('cbr-checked');
+            $('.cbr-replaced input[type=checkbox]').attr("checked","checked");
+        }
+        isAllChecked = !isAllChecked;
+    })
+
+    //批量删除资产信息,在此感谢前端同学的帮助
+    function AllDelete(){
+                $('#modal-delinfo').modal('show');
+                $('#delete_this').click(function(){
+                    var getdata = document.getElementsByClassName('cbr-checked');
+                    var datalist = [];
+                    for(var i=0;i<getdata.length;i++){
+                        var values = getdata[i].firstChild.firstChild.getAttribute('value');
+                        if (values != 0 && values ){
+                               datalist.push(getdata[i].firstChild.firstChild.getAttribute('value'));
+                        }
+                    }
+
+                    //判断是否选择了资产
+                    if (datalist.length  == 0){
+                            toastr.error("没有选择资产信息");
+                            $('#modal-delinfo').modal('hide');
+
+                    }else{
+                        $.ajax({
+                            url: "/assets/del/1",
+                            method: "POST",
+
+                            data:{
+                                'Checked': JSON.stringify(datalist),
+                                 csrfmiddlewaretoken: '{{ csrf_token }}',
+                            },
+                            dataType: 'json',
+                            success: function(resp){
+                                var msginfo = resp.msginfo;
+                                var msgerror = resp.msgerror;
+                                if (msginfo){
+                                    toastr.success(msginfo);
+                                    $('#modal-delinfo').modal('hide');
+                                    setTimeout(function() {
+                                        location.href = location.href;
+                                    },1000);
+                                }
+                                else{
+                                    toastr.error(msgerror);
+                                    $('#modal-delinfo').modal('hide');
+                                    setTimeout(function() {
+                                        location.href = location.href;
+                                    },3000);
+                                }
+
+
+                            },
+
+                            error:function(){
+                                toastr.error("网络异常");
+                            },
+                        })
+                    }
+                })
+    }
+</script>
+
+{% endblock %}

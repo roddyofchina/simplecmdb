@@ -1,0 +1,453 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+				<div class="col-sm-10">
+
+					<div class="panel panel-default">
+						<div class="panel-heading">
+							<h3 class="panel-title">资产修改</h3>
+							<div class="panel-options">
+								<a href="#" data-toggle="panel">
+									<span class="collapse-icon">&ndash;</span>
+									<span class="expand-icon">+</span>
+								</a>
+								<a href="#" data-toggle="remove">
+									&times;
+								</a>
+							</div>
+						</div>
+						<div class="panel-body">
+
+							<form role="form" class="form-horizontal" id="Assetsoneadd" enctype="multipart/form-data">
+                                {% csrf_token %}
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="field-2">资产名称*</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="field-2"  name="assets_name" value="{{Assets_data.Assets_name}}">
+									</div>
+
+                                    <label class="col-sm-2 control-label" for="field-1">资产编号</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="field-1"  name="assets_number" value="{{Assets_data.device_number}}" disabled>
+									</div>
+
+                                         <label class="col-sm-2 control-label" for="field-1">资产类型</label>
+
+									<div class="col-sm-2">
+										<select class="form-control" name="assets_type">
+                                            {% for t in assets_type %}
+                                                {% if Assets_data.device_type.id == t.id%}
+											        <option value="{{t.id}}" selected>{{ t.name}}</option>
+                                                {% else %}
+                                                    <option value="{{t.id}}" >{{ t.name}}</option>
+                                                {%endif%}
+                                            {% endfor %}
+										</select>
+									</div>
+								</div>
+
+								<div class="form-group-separator"></div>
+
+								<div class="form-group">
+
+
+                                    <label class="col-sm-2 control-label" for="field-1">购买方式</label>
+
+                                    <div class="col-sm-2">
+										<select class="form-control" name="assets_buy_type">
+                                            {% for b in Buy_type_choice%}
+                                                {% if  Assets_data.buy_type == b.0 %}
+                                                    <option value="{{b.0}}" selected>{{b.1}}</option>
+                                                {% else%}
+                                                    <option value="{{b.0}}">{{b.1}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+										</select>
+									</div>
+
+
+
+
+                                    <label class="col-sm-2 control-label" for="field-1">价格*(￥)</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="field-1" name="assets_price" value="{{Assets_data.price}}">
+									</div>
+
+                                    <label class="col-sm-2 control-label">状态</label>
+									<div class="col-sm-2">
+										<select class="form-control" name="assets_status">
+                                            {% for i in Status_choice%}
+                                                {% if Assets_data.status == i.0 %}
+											        <option value="{{i.0}}" selected>{{i.1}}</option>
+                                                {% else %}
+                                                    <option value="{{i.0}}">{{i.1}}</option>
+                                                {% endif %}
+                                            {% endfor %}
+										</select>
+									</div>
+								</div>
+
+
+								<div class="form-group-separator"></div>
+								<div class="form-group">
+
+                                    		<label class="col-sm-2 control-label" for="field-2">购买时间*</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control datepicker" name="assets_buy_time"  value="{{Assets_data.buy_time}}" >
+									</div>
+
+
+                                      <label class="col-sm-2 control-label" for="field-1">开始使用时间</label>
+
+									<div class="col-sm-2">
+											<input type="text" class="form-control datepicker" name="assets_use_time" value="{{Assets_data.suse_time}}" >
+
+									</div>
+
+                                          <label class="col-sm-2 control-label" for="field-1">截至使用时间</label>
+									<div class="col-sm-2">
+										<input type="text" class="form-control datepicker"  name="assets_end_time" value="{{Assets_data.euse_time}}">
+									</div>
+								</div>
+
+								<div class="form-group-separator"></div>
+
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="field-3">保质期*(月)</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="field-3"  name="assets_warranty" value="{{Assets_data.Warranty}}">
+									</div>
+
+                                    <label class="col-sm-2 control-label" for="admin_users">负责人</label>
+
+									<div class="col-sm-2">
+										<input type="hidden" class="form-control" name="admin_users" id="admin_users" >
+									</div>
+                                    <script>
+
+
+                                    </script>
+
+
+                                    <label class="col-sm-2 control-label "  for="use_users">使用人</label>
+                                    <div class="col-sm-2">
+									<input type="hidden" name="use_users" id="use_users" />
+								    </div>
+								</div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+
+
+                                    <label class="col-sm-2 control-label">IDC</label>
+
+                                    <div class="col-sm-2">
+                                        <select class="form-control" name="idcinfo">
+                                            {% for idc in IDCdata%}
+                                                {% if Assets_data.IDC.id == idc.id %}
+                                                    <option value="{{idc.id}}" selected>{{idc}}</option>
+                                                {%else%}
+                                                    <option value="{{idc.id}}">{{idc}}</option>
+                                                {%endif%}
+                                            {% endfor%}
+                                        </select>
+                                    </div>
+
+
+                                    <label class="col-sm-2 control-label">业务</label>
+
+                                    <div class="col-sm-2">
+                                        <select class="form-control" name="business">
+                                            {% for bs in Businessdata%}
+                                                {% if Assets_data.business.id == bs.id %}
+                                                    <option value="{{bs.id}}" selected>{{bs}}</option>
+                                                {% else %}
+                                                     <option value="{{bs.id}}">{{bs}}</option>
+                                                {% endif %}
+                                            {% endfor%}
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group-separator"></div>
+
+                                <div class="form-group">
+
+
+                                    <label class="col-sm-2 control-label">提供商</label>
+
+                                    <div class="col-sm-2">
+                                        <select class="form-control" name="assets_provider">
+                                            {% for p in Provider_data%}
+                                                {% if Assets_data.provider.id == p.id %}
+                                                        <option value="{{p.id}}" selected>{{p}}</option>
+                                                {%else%}
+                                                         <option value="{{p.id}}">{{p}}</option>
+                                                {%endif%}
+                                            {% endfor%}
+                                        </select>
+                                    </div>
+
+
+                                    <label class="col-sm-2 control-label">管理员</label>
+
+                                    <div class="col-sm-4">
+                                        <script type="text/javascript">
+                                            jQuery(document).ready(function($)
+                                            {
+                                                $("#adminusers").select2({
+                                                    placeholder: '选择管理员',
+                                                    allowClear: true
+                                                }).on('select2-open', function()
+                                                {
+                                                    // Adding Custom Scrollbar
+                                                    $(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
+                                                });
+
+                                            });
+
+                                        </script>
+
+                                        <select class="form-control" id="adminusers" name="manager_user" multiple>
+                                            <option></option>
+                                            <optgroup label="管理员列表">
+                                                {% for u in  AdminUser %}
+                                                        {% if u in SelectAdmin %}
+                                                            <option value="{{u.id}}" selected>{{u}}</option>
+                                                        {%else%}
+                                                            <option value="{{u.id}}" >{{u}}</option>
+                                                        {%endif%}
+                                                {% endfor %}
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+								<div class="form-group-separator"></div>
+
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="description">备注</label>
+
+									<div class="col-sm-4">
+										<textarea class="form-control" cols="10" rows="10" id="description" name="description" >{{Assets_data.description}}</textarea>
+									</div>
+								</div>
+                                <div class="col-sm-2 col-md-offset-10">
+                                    <button class="btn btn-info" id="submit" type="submit" onclick="Assets_add()">修改</button>
+                                </div>
+							</form>
+						</div>
+					</div>
+				</div>
+
+
+
+
+<script type="text/javascript">
+  $(function () {
+    $(".datepicker").datepicker({
+      language: "zh-CN",
+      autoclose: true,//选中之后自动隐藏日期选择框
+    });
+  });
+</script>
+<link rel="stylesheet" href="/static/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/static/assets/js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="/static/assets/js/multiselect/css/multi-select.css">
+<script src="/static/assets/js/bootstrap-typeahead.js"></script>
+<script src="/static/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<script src="/static/assets/js/select2/select2.min.js"></script>
+<script src="/static/assets/js/tagsinput/bootstrap-tagsinput.min.js"></script>
+<script src="/static/assets/js/typeahead.bundle.js"></script>
+<script src="/static/assets/js/bootstrap.autocomplete.js"></script>
+
+
+
+<script type="text/javascript">
+
+
+
+jQuery(document).ready(function($)
+{
+
+
+
+    $("#use_users").select2({
+        minimumInputLength: 1,
+        placeholder: 'Search',
+        ajax: {
+            url: "/employee/users_query/",
+            dataType: 'json',
+            quietMillis: 100,
+            data: function(term, page) {
+                return {
+                    limit: 10,
+                    search: term
+                };
+            },
+            results: function(data, page ) {
+                return { results: data }
+            }
+        },
+        formatResult: function(student) {
+            return "<div class='select2-user-result'>" + student.name + "</div>";
+        },
+        formatSelection: function(student) {
+            return  student.name;
+        },
+        dropdownCssClass: "bigdrop",
+    });
+
+
+    $('#select2-chosen-2').text('{{Assets_data.Employee}}');
+
+});
+</script>
+
+<script type="text/javascript">
+jQuery(document).ready(function($)
+{
+    $("#admin_users").select2({
+        minimumInputLength: 1,
+        placeholder: 'Search',
+        ajax: {
+            url: "/employee/users_query/",
+            dataType: 'json',
+            quietMillis: 100,
+            data: function(term, page) {
+                return {
+                    limit: 10,
+                    search: term
+                };
+            },
+            results: function(data, page ) {
+                return { results: data }
+            }
+        },
+        formatResult: function(student) {
+            return "<div class='select2-user-result'>" + student.name + "</div>";
+        },
+        formatSelection: function(student) {
+            return  student.name;
+        },
+        dropdownCssClass: "bigdrop",
+    });
+
+
+     $('#select2-chosen-3').text('{{Assets_data.principal}}');
+});
+</script>
+
+<script type="text/javascript">
+   function Assets_add(){
+        $("form#Assetsoneadd").validate({
+                rules: {
+                    assets_name: {
+                        required: true
+                    },
+
+                    assets_buy_time: {
+                        required: true
+                    },
+
+                    assets_price: {
+                        required: true
+                    },
+
+                    admin_users: {
+                        required: true
+                    },
+                    assets_warranty: {
+                        required: true
+
+                    }
+                },
+
+                messages: {
+                    assets_name: {
+                        required: '请输入资产名'
+                    },
+                    assets_buy_time: {
+                        required: '请输入购买时间'
+                    },
+                    assets_price: {
+                        required: '请输入资产价格'
+                    },
+
+                    assets_warranty: {
+                        required: '请输入保修期'
+                    },
+                    admin_users: {
+                        required: '请输入负责人'
+                    },
+                },
+
+                // 添加用户信息
+                submitHandler: function()
+                {
+                          var description = $('#description').val();
+                          var data_list = [];
+                          var obj = document.getElementById('adminusers');
+
+                          for( var i=0;i<obj.selectedOptions.length;i++){
+                                data_list.push(obj.selectedOptions[i].getAttribute('value'))
+                                }
+                          $.ajax({
+                                url: "{% url "assets_edit" Assets_data.id %}",
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    assets_name: $("input[name='assets_name']").val(),
+                                    assets_warranty: $("input[name='assets_warranty']").val(),
+                                    admin_users: $("input[name='admin_users']").val(),
+                                    assets_number: $("input[name='assets_number']").val(),
+                                    use_users: $("input[name='use_users']").val(),
+                                    assets_price: $("input[name='assets_price']").val(),
+                                    assets_buy_time: $("input[name='assets_buy_time']").val(),
+                                    assets_end_time: $("input[name='assets_end_time']").val(),
+                                    assets_use_time: $("input[name='assets_use_time']").val(),
+                                    assets_type: $("select[name='assets_type']").val(),
+                                    assets_status: $("select[name='assets_status']").val(),
+                                    assets_buy_type: $("select[name='assets_buy_type']").val(),
+                                    assets_provider: $("select[name='assets_provider']").val(),
+                                    idcinfo: $("select[name='idcinfo']").val(),
+                                    business: $("select[name='business']").val(),
+                                    manager_user: JSON.stringify(data_list),
+                                    description: description,
+                                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                                },
+                                success: function(resp)
+                                {
+                                    var msginfo = resp.msginfo;
+                                    var msgerror = resp.msgerror;
+                                    if (msginfo){
+                                        toastr.success(msginfo);
+                                        setTimeout(function() {
+                                            location.href = '/assets/list/1';
+                                        },1000);
+                                    }
+                                    else{
+                                        toastr.error(msgerror);
+                                    }
+                                },
+                                error: function() {
+
+                                    toastr.error("网络异常");
+                                }
+                        });
+                }
+        });
+   }
+</script>
+
+
+{% endblock%}

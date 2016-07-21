@@ -1,0 +1,277 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-devicetypeadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加设备类型</button>
+        </a>
+    </p>
+</div>
+
+
+<div class="col-sm-6">
+
+    <div class="panel panel-default">
+        <strong>类型列表</strong>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+
+                <th>类型</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for type in devicetype_data %}
+            <tr>
+                <td>{{ type.name}}</td>
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="devicetype_edit_name('{{ type.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{type.id}}')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+
+<script type="text/javascript">
+       function Devicetype_add(e){
+               $("form#devicetype_add").validate({
+                        rules: {
+                            devicetype_name: {
+                                required: true
+                            },
+                        },
+
+                        messages: {
+                            devicetype_name: {
+                                required: '请输入类型名称'
+                            },
+                        },
+
+                        // 添加用户信息
+                        submitHandler: function(form)
+                        {
+                               e.preventDefault();
+                               var serializeData = $('#devicetype_add').serialize();
+                               $('#devicetype_add').ajaxSubmit({
+                                       type:'POST',
+                                       url: "{% url 'devicetype_list' %}",
+                                       dataType: 'json',
+                                       data: serializeData,
+                                       contentType: false,
+                                       cache: false,
+                                       processData:false,
+                                        success: function(resp)
+                                        {
+                                            var msginfo = resp.msginfo;
+                                            var msgerror = resp.msgerror;
+                                            if (msginfo){
+                                                toastr.success(msginfo);
+                                                //关闭模态框
+                                                $('#modal-devicetypeadd').modal('hide');
+                                                setTimeout(function() {
+                                                    location.href = location.href;
+                                                },1000);
+                                            }
+                                            else{
+                                                $('#modal-devicetypeadd').modal('hide');
+                                                toastr.error(msgerror);
+                                            }
+                                        },
+                                        error: function() {
+                                            toastr.error("网络异常");
+                                        }
+                                });
+
+                        }
+               });
+        }
+
+</script>
+
+<script type="text/javascript">
+    function devicetype_edit_name(id){
+        $(function(){
+            $.ajax({
+                        url: "/assets/devicetype/edit/" + id,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+                                toastr.error(msgerror);
+                          }
+                          else{
+                              document.getElementById('devicetype_edit_name').value = resp.typename;
+                              document.getElementById('devicetype_edit_name').setAttribute('typeid',resp.tag);
+                              $('#modal-devicetypeedit').modal('show');
+                          }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+
+
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function devicetype_edit(){
+        var id = document.getElementById('devicetype_edit_name').attributes['typeid'].value;
+        $.ajax({
+                url: "/assets/devicetype/edit/" + id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    typename:  document.getElementById('devicetype_edit_name').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-devicetypeedit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                         toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+
+<!-- 删除信息确认-->
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/assets/devicetype/del/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+
+
+{% endblock %}
+
+
+{% block modal-content %}
+    <div class="modal fade" id="modal-devicetypeadd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <form method="post" role="form" id="devicetype_add" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">设备类型添加</h4>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="row">
+                            <div class="col-md-6">
+
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">类型</label>
+
+                                    <input type="text" class="form-control" id="devicetype_name" name="devicetype_name"
+                                           required="required">
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-info" onclick="Devicetype_add(event)">添加</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-devicetypeedit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">设备类型修改</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">类型</label>
+                                <input type="text" class="form-control" id="devicetype_edit_name" name="devicetype_edit_name" value="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-info"  onclick="devicetype_edit()">修改</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

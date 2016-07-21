@@ -1,0 +1,26 @@
+<div class="page-title">
+
+    <div class="title-env">
+        <h3 class="title">导航栏</h3>
+
+    </div>
+
+    <div class="breadcrumb-env">
+
+        <ol class="breadcrumb bc-1">
+            <li>
+                <a href="/"><i class="fa-home"></i>{{panelsindex}}</a>
+            </li>
+            <li>
+            {% if panels1 %}
+                <a>{{ panels1 }}</a>
+            {% endif %}
+            </li>
+            {% if panels2 %}
+            <li class="active">
+                <strong>{{ panels2 }}</strong>
+            </li>
+            {% endif %}
+        </ol>
+    </div>
+</div>

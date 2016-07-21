@@ -1,0 +1,303 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">人员信息修改</h3>
+
+                <div class="panel-options">
+                    <a href="#" data-toggle="panel">
+                        <span class="collapse-icon">&ndash;</span>
+                        <span class="expand-icon">+</span>
+                    </a>
+                    <a href="#" data-toggle="remove">
+                        &times;
+                    </a>
+                </div>
+            </div>
+
+            <div class="panel-body">
+                <form role="form" class="form-horizontal" method="POST" id="Employee_edit" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="name">员工姓名</label>
+
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="name" name="name"
+                                   value="{{Employee_data.name}}">
+                        </div>
+
+
+                        <label class="col-sm-1 control-label" for="number">工号</label>
+
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" id="number" name="number"
+                                   value="{{Employee_data.number}}">
+                        </div>
+
+
+                        <label class="col-sm-1 control-label" for="phone">联系方式</label>
+
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{Employee_data.contact}}">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group-separator"></div>
+
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label" for="email">Email</label>
+
+                        <div class="col-sm-4">
+                            <input type="email" class="form-control" name="email"  value="{{Employee_data.email}}">
+                        </div>
+
+
+                        <label class="col-sm-2 control-label" >年龄</label>
+
+                        <div class="col-sm-1">
+                            <input type="text" class="form-control" name="age"  value="{{Employee_data.age}}">
+                        </div>
+
+                    </div>
+
+                    <div class="form-group-separator"></div>
+                    <div class="form-group">
+                        <label for="field-5" class=" col-sm-2 control-label">姓别</label>
+                        {% if Employee_data.sex == 1 %}
+                        <p class="col-sm-4">
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="1" checked>
+                                男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="2">
+                                女
+                            </label>
+                        </p>
+                        {% else %}
+                        <p class="col-sm-4">
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="1">
+                                男
+                            </label>
+                            <label class="radio-inline">
+                                <input type="radio" name="sex" value="2" checked>
+                                女
+                            </label>
+                        </p>
+                        {% endif %}
+                    </div>
+
+
+                    <div class="form-group-separator"></div>
+                     <div class="form-group">
+                        <label class="col-sm-2 control-label">入职时间</label>
+
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="entrytime" id="entrytime" value="{{Employee_data.EntryTime}}">
+                        </div>
+
+                        <label class="col-sm-2 control-label" >出生日期</label>
+
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control"  name="birthday" value="{{Employee_data.birthday}}">
+                        </div>
+                         <label class="col-sm-2 control-label" >离职日期</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="exittime" value="{{Employee_data.ExitTime}}">
+                        </div>
+                    </div>
+
+
+                    <div class="form-group-separator"></div>
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label">部门</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="dept">
+                                {% for lin in Department_info %}
+                                    {% if lin.id == Employee_data.dept.id %}
+                                    <option value="{{lin.id}}" selected>{{lin.name}}</option>
+                                    {% else%}
+                                    <option value="{{lin.id}}">{{lin.name}}</option>
+                                    {% endif%}
+                                {% endfor%}
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label">状态</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="status">
+                                {% for i in Employee_status %}
+                                    {% if i.0 == Employee_data.status %}
+                                        <option value="{{i.0}}" selected>{{i.1}}</option>
+                                        {% else%}
+                                        <option value="{{i.0}}">{{i.1}}</option>
+                                    {% endif%}
+                                {%endfor%}
+                            </select>
+                        </div>
+
+
+                        <label class="col-sm-2 control-label">职位</label>
+                        <div class="col-sm-2">
+                            <select class="form-control" name="jobtitle">
+                                {% for lin in Department_jobtitle %}
+                                    {% if lin.id == Employee_data.jobtitle.id %}
+                                    <option value="{{lin.id}}" selected>{{lin.name}}</option>
+                                    {% else%}
+                                    <option value="{{lin.id}}">{{lin.name}}</option>
+                                    {% endif%}
+                                {% endfor%}
+                            </select>
+                        </div>
+
+                        </div>
+                        <div class="form-group-separator"></div>
+                         <div class="form-group">
+                            <label class="col-sm-2 control-label" for="universit">毕业院校</label>
+
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="universit" id="universit" value="{{Employee_data.universit}}">
+                            </div>
+                         </div>
+
+
+                         <div class="form-group-separator"></div>
+                         <div class="form-group">
+                            <label class="col-sm-2 control-label" for="family_address">家庭住址</label>
+
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" name="family_address" id="family_address" value="{{Employee_data.family_address}}">
+                            </div>
+                         </div>
+
+
+                    <div class="form-group-separator"></div>
+                    <div class="form-group">
+                        <label for="field-5" class=" col-sm-2 control-label">个人照</label>
+
+                        <div class="col-sm-4">
+                            <input type="file" class=" form-control" name="photo" id="photo">
+                        </div>
+                    </div>
+
+                    <div class="form-group-separator"></div>
+                    <div class="form-group">
+                        <label for="field-5" class=" col-sm-2 control-label">照片</label>
+
+                        <div class="col-sm-2">
+                            <div class="xe-widget xe-single-news">
+                                <div>
+                                    <img src="/static{{Employee_data.photo}}"
+                                            />
+                                    <span class="xe-gradient"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="form-group">
+                            <div class="col-md-1 col-md-offset-8">
+                                <button type="button" class="btn btn-white" onclick="back()">返回</button>
+                            </div>
+                            <div class="col-md-1 ">
+                                <button type="submit" class=" btn btn-info" onclick="Employeeedit(event)">修改</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+      function back(){
+        history.go(-1);
+      };
+
+      function Employeeedit(e){
+        $("form#Employee_edit").validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    number: {
+                        required: true,
+
+                    },
+                    email: {
+                        required: true
+                    },
+                    phone: {
+                        required: true
+                    },
+                    age: {
+                        required: true
+                    },
+                },
+
+                messages: {
+                    username: {
+                        required: '请输入用户名'
+                    },
+                    email: {
+                        required: '请输入邮箱地址',
+                        email: '请输入正确的邮箱地址',
+                    },
+                    realname: {
+                        required: '请输入用户真实姓名',
+                    },
+                    qq_info:{
+                        digits: '请输入数字',
+                    }
+                },
+
+                // 添加用户信息
+                submitHandler: function(form)
+                {
+                          e.preventDefault();
+                          //序列化表单
+                          var serializeData = $('#Employee_edit').serialize();
+                          $('#Employee_edit').ajaxSubmit({
+                               type:'POST',
+                               url: "{% url 'employee_edit' Employee_data.id  %}",
+                               dataType: 'json',
+                               data: serializeData,
+                               contentType: false,
+                               cache: false,
+                               processData:false,
+                               beforeSubmit: function() {
+                                    //上传图片之前的处理
+                               },
+                               uploadProgress: function (event, position, total, percentComplete){
+                                   //在这里控制进度条
+                               },
+                               success:function(resp){
+                                    var msginfo = resp.msginfo;
+                                    toastr.success(msginfo);
+                                    setTimeout(function() {
+                                        location.href = '/employee/users/1';
+                                    },1000);
+                               },
+                               error:function(data){
+                                   toastr.error("网络异常");;
+                               }
+
+                          });
+                }
+            });
+    }
+
+
+
+
+</script>
+
+
+{% endblock %}

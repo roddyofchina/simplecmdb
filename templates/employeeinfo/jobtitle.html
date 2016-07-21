@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-jobtitleadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加职称</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-sm-9">
+
+    <div class="panel panel-default">
+        <strong>职称列表</strong>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>职称</th>
+
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for job in JobListData %}
+            <tr>
+                <td>{{ job.name}}</td>
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="jobtitledit('{{ job.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{job.id}}')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<div class="col-sm-8">
+    <ul class="pagination">
+        {{pages}}
+    </ul>
+</div>
+
+
+
+<script type="text/javascript">
+       function Job_add(){
+               $("form#jobadd").validate({
+                        rules: {
+                            jobsname: {
+                                required: true
+                            },
+                        },
+
+                        messages: {
+                            jobsname: {
+                                required: '请输入职称名'
+                            },
+
+                        },
+
+                        // 添加用户信息
+                        submitHandler: function()
+                        {
+                              $.ajax({
+                                url: "{% url "jobtitle_add" %}",
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                    jobsname: $("input[name='jobsname']").val(),
+                                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                                },
+                                success: function(resp)
+                                {
+                                    var msginfo = resp.msginfo;
+                                    var msgerror = resp.msgerror;
+                                    if (msginfo){
+                                        toastr.success(msginfo);
+                                        $('#modal-jobtitleadd').modal('hide');
+                                        setTimeout(function() {
+                                            location.href = '/employee/jobtitle/list/';
+                                        },1000);
+                                    }
+                                    else{
+                                        toastr.error(msgerror);
+                                        setTimeout(function() {
+                                            location.href = '/employee/jobtitle/list/';
+                                        },1000);
+                                    }
+                                },
+                                error: function() {
+
+                                    toastr.error("网络异常");
+                                }
+                        });
+
+                        }
+               });
+        }
+
+</script>
+
+
+<script type="text/javascript">
+    function jobtitledit(jobid){
+        $(function(){
+            $.ajax({
+                        url: "/employee/jobtitle/edit/" + jobid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+                                toastr.error(msgerror);
+                          }
+                          else{
+                              document.getElementById('job_edit_name').value = resp.jobname;
+                              document.getElementById('job_edit_name').setAttribute('jobid',resp.tag);
+                              $('#modal-jobtitledit').modal('show');
+                          }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function job_edit_info(){
+        var id = document.getElementById('job_edit_name').attributes['jobid'].value;
+        $.ajax({
+                url: "/employee/jobtitle/edit/"+id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    jobname:  document.getElementById('job_edit_name').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-jobtitledit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                         toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+
+<script type="text/javascript">
+    function clickurl(jobid){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/employee/jobtitle/del/" + jobid,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+
+
+{% endblock %}
+
+
+
+
+
+{% block modal-content %}
+
+   <div class="modal fade" id="modal-jobtitleadd">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" role="form" id="jobadd">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">职称添加</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-md-6">
+
+                            <div class="form-group">
+                                <label for="field-1" class="control-label">职称</label>
+
+                                <input type="text" class="form-control" id="jobname" name="jobsname"
+                                       required="required">
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-info" onclick="Job_add()">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+   <div class="modal fade" id="modal-jobtitledit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">职称修改</h4>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+
+                        <div class="form-group">
+                            <label for="field-1" class="control-label">职称</label>
+                            <input type="text" class="form-control" id="job_edit_name" name="job_edit_name" value=""
+                                    >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-info" id="postjobedit" onclick="job_edit_info()">修改</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

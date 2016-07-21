@@ -1,0 +1,380 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+
+    <div class="col-md-8">
+        <form role="form" class="form-horizontal" id="Server_add" enctype="multipart/form-data">
+           {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="tabs-vertical-env">
+                    <ul class="nav tabs-vertical">
+                        <li class="active"><a href="#v-home" data-toggle="tab">服务器信息</a></li>
+                        <li><a href="#v-cpu" data-toggle="tab">CPU</a></li>
+                        <li><a href="#v-mem" data-toggle="tab">内存</a></li>
+                        <li><a href="#v-disk" data-toggle="tab">磁盘</a></li>
+                        <li><a href="#v-nic" data-toggle="tab">网卡</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="v-home">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label class="col-md-2 control-label" for="field-2">资产名称</label>
+
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="field-2"
+                                                           name="assets_name">
+                                                </div>
+
+                                                <label class="col-md-2 control-label" for="field-2">服务器名称</label>
+
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="field-2"
+                                                           name="Server_name">
+                                                </div>
+
+                                                <label class="col-md-2 control-label" for="field-1">服务器SN号</label>
+
+                                                <div class="col-md-2">
+                                                    <input type="text" class="form-control" id="field-1"
+                                                           name="assets_number">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="field-2">厂商</label>
+
+                                                <div class="col-sm-4">
+                                                     <select class="form-control" name="server_provider">
+                                                        {% for p in ProviderList %}
+                                                        <option value="{{p.id}}">{{p}}</option>
+                                                        {% endfor %}
+                                                     </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="field-1">型号</label>
+
+                                                <div class="col-sm-2">
+                                                    <input type="text" class="form-control" id="field-1"
+                                                           name="assets_number">
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+
+                                        <div class="row">
+                                            <div class="form-group">
+                                                <label class="col-sm-2 control-label" for="field-2">软件列表</label>
+
+                                                <div class="col-sm-4">
+                                                        <script type="text/javascript">
+                                                            jQuery(document).ready(function($)
+                                                            {
+                                                                $("#software").select2({
+                                                                    placeholder: '选择已安装软件',
+                                                                    allowClear: true
+                                                                }).on('select2-open', function()
+                                                                {
+                                                                    // Adding Custom Scrollbar
+                                                                    $(this).data('select2').results.addClass('overflow-hidden').perfectScrollbar();
+                                                                });
+
+                                                            });
+                                                        </script>
+
+                                                        <select class="form-control" id="software" name="software" multiple>
+                                                            <option></option>
+                                                            <optgroup label="选择已安装软件">
+                                                                {%for soft in  SoftwareList %}
+                                                                    <option value="{{ soft.id }}">{{soft}}</option>
+                                                                {%endfor%}
+                                                            </optgroup>
+                                                        </select>
+                                                    </div>
+                                            </div>
+                                        </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="v-cpu">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label" for="field-2">厂商</label>
+
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-md-2 control-label" for="field-1">架构</label>
+
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">型号</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-sm-2 control-label" for="field-1">个数</label>
+
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">频率</label>
+
+                                            <div class="col-sm-3">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-1">1级缓存</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                            <label class="col-sm-2 control-label" for="field-1">2级缓存</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                            <label class="col-sm-2 control-label" for="field-1">3级缓存</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-1">线程数</label>
+
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="v-mem">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label" for="field-2">容量</label>
+
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-md-2 control-label" for="field-1">条数</label>
+
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">SWAP容量</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="v-disk">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label" for="field-2">名称</label>
+
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-md-2 control-label" for="field-1">SN号</label>
+
+                                            <div class="col-md-2">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">容量</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-sm-2 control-label" for="field-2">类型</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">挂载点</label>
+
+                                            <div class="col-sm-2">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="v-nic">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                        <div class="form-group">
+                                            <label class="col-md-2 control-label" for="field-2">名称</label>
+
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-md-2 control-label" for="field-1">型号</label>
+
+                                            <div class="col-md-4">
+                                                <input type="text" class="form-control" id="field-1"
+                                                       name="assets_number">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">IP</label>
+
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+
+                                            <label class="col-sm-2 control-label" for="field-2">MAC</label>
+
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label" for="field-2">掩码</label>
+
+                                            <div class="col-sm-4">
+                                                <input type="text" class="form-control" id="field-2" name="assets_name">
+                                            </div>
+                                        </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-sm-2 col-md-offset-10">
+                    <button class="btn btn-info" id="submit" type="submit" onclick="Serveradd(event)">添加</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+<link rel="stylesheet" href="/static/assets/js/select2/select2.css">
+<link rel="stylesheet" href="/static/assets/js/select2/select2-bootstrap.css">
+<link rel="stylesheet" href="/static/assets/js/multiselect/css/multi-select.css">
+<script src="/static/assets/js/bootstrap-typeahead.js"></script>
+<script src="/static/assets/js/multiselect/js/jquery.multi-select.js"></script>
+<script src="/static/assets/js/select2/select2.min.js"></script>
+<script src="/static/assets/js/tagsinput/bootstrap-tagsinput.min.js"></script>
+<script src="/static/assets/js/typeahead.bundle.js"></script>
+<script src="/static/assets/js/bootstrap.autocomplete.js"></script>
+
+<script type="text/javascript">
+   function Serveradd(e){
+        $("form#Server_add").validate({
+                rules: {
+                    Server_name: {
+                        required: true
+                    },
+
+                },
+                messages: {
+                    Server_name: {
+                        required: '服务器名'
+                    },
+                },
+
+                // 添加用户信息
+                submitHandler: function(form)
+                {
+                   e.preventDefault();
+
+                  var serializeData = $('#Server_add').serialize();
+
+                  $('#Server_add').ajaxSubmit({
+                       type:'POST',
+                       url: "{% url 'Assets_server_add' %}",
+                       dataType: 'json',
+                       data: serializeData,
+                       contentType: false,
+                       cache: false,
+                       processData:false,
+
+                       beforeSubmit: function() {
+                            //上传图片之前的处理
+                       },
+                       uploadProgress: function (event, position, total, percentComplete){
+                           //在这里控制进度条
+                       },
+                       success:function(resp){
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-useradd').modal('hide');
+                                setTimeout(function() {
+                                    location.href = '/users/list/1';
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-useradd').modal('hide');
+                            }
+                       },
+                       error:function(data){
+                           toastr.error("网络异常");;
+                       }
+                   });
+
+                }
+        });
+   }
+</script>
+{% endblock %}
+
+
+

@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+<div class="row">
+    <div class="col-md-6">
+        <div class="row">
+            <div class="col-md-2">
+                <p>
+                        <button class="btn btn-info"  id="back" type="button">返回</button>
+                </p>
+                </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                用户详细信息
+            </div>
+            <div class="panel-body">
+
+                <table class="table">
+                        <tbody>
+                        <tr>
+                            <td >用户名</td>
+                            <td>{{Userinfo.username}}</td>
+                        </tr>
+                        <tr>
+                            <td >姓名</td>
+                            <td>{{Userinfo.realname}}</td>
+                        </tr>
+                         <tr>
+                            <td >邮箱</td>
+                            <td>{{Userinfo.email}}</td>
+                        </tr>
+
+                        <tr>
+                            <td>状态</td>
+                            {% if Userinfo.is_active %}
+                            <td>激活</td>
+                            {%else%}
+                            <td>禁用</td>
+                            {%endif%}
+                        </tr>
+                        <tr>
+                            <td>部门</td>
+                            <td>{{Userinfo.department}}</td>
+                        </tr>
+                        <tr>
+                            <td>QQ</td>
+                            <td>{{Userinfo.QQ}}</td>
+                        </tr>
+
+                        <tr>
+                            <td>联系方式</td>
+                            <td>{{Userinfo.phone}}</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>创建时间</td>
+                            <td>{{Userinfo.date_joined|date:"Y-m-d H:i"}}</td>
+                        </tr>
+
+
+                        <tr>
+                            <td>最后登录</td>
+                            <td>{{Userinfo.last_login|date:"Y-m-d H:i"}}</td>
+                        </tr>
+
+                        <tr>
+                            <td>头像</td>
+                            <td><img src="/static{{Userinfo.photo}}"></img></td>
+                        </tr>
+
+                    </tbody>
+                </table>
+                </div>
+            </div>
+    </div>
+
+</div>
+
+<script type="text/javascript">
+    $(function(){
+       $("#back").click(function(){
+             history.go(-1);
+       });
+    });
+
+</script>
+
+
+{% endblock %}

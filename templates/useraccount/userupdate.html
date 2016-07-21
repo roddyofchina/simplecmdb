@@ -1,0 +1,242 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                	<h3 class="panel-title">用户信息修改</h3>
+							<div class="panel-options">
+								<a href="#" data-toggle="panel">
+									<span class="collapse-icon">&ndash;</span>
+									<span class="expand-icon">+</span>
+								</a>
+								<a href="#" data-toggle="remove">
+									&times;
+								</a>
+							</div>
+
+            </div>
+
+            <div class="panel-body">
+                    <form role="form" class="form-horizontal" method="POST"  id="User_edit" enctype="multipart/form-data">
+                             {% csrf_token %}
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="username">用户名</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="username" name="username" value="{{Userdata.username}}" >
+									</div>
+
+
+                                    <label class="col-sm-1 control-label" for="realname">姓名</label>
+
+									<div class="col-sm-2">
+										<input type="text" class="form-control" id="realname"  name="realname" value="{{Userdata.realname}}" >
+									</div>
+
+
+                                    <label class="col-sm-1 control-label" for="phone">手机</label>
+
+									<div class="col-sm-3">
+										<input type="text" class="form-control" id="phone"  name="phone" value="{{Userdata.phone}}">
+									</div>
+
+								</div>
+
+								<div class="form-group-separator"></div>
+
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="email">Email</label>
+
+									<div class="col-sm-6">
+										<input type="email" class="form-control"  name="email" id="email" value="{{Userdata.email}}" >
+									</div>
+								</div>
+
+								<div class="form-group-separator"></div>
+
+                                <div class="form-group">
+									<label class="col-sm-2 control-label" for="qq_info">QQ信息</label>
+
+									<div class="col-sm-4">
+										<input type="text" class="form-control" id="qq_info"  name="qq_info" value="{{Userdata.QQ}}" >
+									</div>
+								</div>
+
+
+                        <div class="form-group-separator"></div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label" for="field-2">部门</label>
+                            <div class="col-sm-4">
+                                <select class="form-control" name="dept">
+                                    {% for lin in Department_info %}
+                                        {% if lin.id == Userdata.department.id %}
+
+                                            <option value="{{lin.id}}" selected>{{lin.name}}</option>
+                                        {% else%}
+                                            <option value="{{lin.id}}">{{lin.name}}</option>
+                                        {% endif%}
+                                    {% endfor%}
+                                </select>
+                            </div>
+                        </div>
+
+                         <div class="form-group-separator"></div>
+                        <div class="form-group">
+                                <label for="field-5" class=" col-sm-2 control-label">状态</label>
+                                {% if Userdata.is_active == 1 %}
+                                    <p class="col-sm-4">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_active" value="1" checked>
+                                            激活
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_active" value="0">
+                                            禁用
+                                        </label>
+                                    </p>
+                                {% else %}
+                                   <p class="col-sm-4">
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_active" value="1" >
+                                            激活
+                                        </label>
+                                        <label class="radio-inline">
+                                            <input type="radio" name="is_active" value="0" checked>
+                                            禁用
+                                        </label>
+                                    </p>
+
+                                {% endif %}
+
+                        </div>
+
+                        <div class="form-group-separator"></div>
+                        <div class="form-group">
+                            <label for="field-5" class=" col-sm-2 control-label">用户头像</label>
+
+                            <div class="col-sm-4">
+                                <input type="file" class=" form-control" name="photo" id="photo">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group-separator"></div>
+                        <div class="form-group">
+                            <label for="field-5" class=" col-sm-2 control-label">头像</label>
+
+                            <div class="col-sm-2">
+                                <div class="xe-widget xe-single-news">
+                                    <div class="xe-image">
+                                        <img src="/static{{Userdata.photo}}"
+                                             class="img-responsive"/>
+                                        <span class="xe-gradient"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                                <div class="form-group">
+                                    <div class="col-md-1 col-md-offset-8">
+                                    <button type="button" class="btn btn-white" onclick="back()">返回</button>
+                                        </div>
+                                    <div class="col-md-1 ">
+                                    <button type="submit" class=" btn btn-info" onclick="Useredit(event)" >修改</button>
+                                        </div>
+                                </div>
+                        </div>
+                        </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+      function back(){
+        history.go(-1);
+      };
+
+      function Useredit(e){
+        $("form#User_edit").validate({
+                rules: {
+                    username: {
+                        required: true
+                    },
+                    email: {
+                        required: true
+                    },
+                    realname: {
+                        required: true
+                    },
+                    qq_info: {
+                        digits: true
+                    }
+                },
+
+                messages: {
+                    username: {
+                        required: '请输入用户名'
+                    },
+                    email: {
+                        required: '请输入邮箱地址',
+                        email: '请输入正确的邮箱地址',
+                    },
+                    realname: {
+                        required: '请输入用户真实姓名',
+                    },
+                    qq_info:{
+                        digits: '请输入数字',
+                    }
+                },
+
+                // 添加用户信息
+                submitHandler: function(form)
+                {
+                          e.preventDefault();
+                          //序列化表单
+                          var serializeData = $('#User_edit').serialize();
+                          $('#User_edit').ajaxSubmit({
+                               type:'POST',
+                               url: "{% url 'users_update' Userdata.id  %}",
+                               dataType: 'json',
+                               data: serializeData,
+                               contentType: false,
+                               cache: false,
+                               processData:false,
+
+                               beforeSubmit: function() {
+                                    //上传图片之前的处理
+                               },
+                               uploadProgress: function (event, position, total, percentComplete){
+                                   //在这里控制进度条
+                               },
+                               success:function(resp){
+                                    var msginfo = resp.msginfo;
+                                    toastr.success(msginfo);
+                                    setTimeout(function() {
+                                        location.href = '/users/list/1';
+                                    },1000);
+                               },
+                               error:function(data){
+                                   toastr.error("网络异常");;
+                               }
+                          });
+                }
+
+            });
+    }
+
+
+
+</script>
+
+
+
+
+
+
+
+
+{% endblock %}

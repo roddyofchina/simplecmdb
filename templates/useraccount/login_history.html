@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+
+{% block page-content %}
+
+
+<div class="col-sm-10">
+    <div class="panel panel-default">
+
+        <!-- Hover Table -->
+        <strong>用户登录历史</strong>
+
+        <table class="table table-hover">
+            <thead>
+            <tr>
+                <th>用户</th>
+                <th>来源IP</th>
+                <th>email</th>
+                <th>login时间</th>
+                <th>logout时间</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for i in Rtdata%}
+            <tr>
+                <td>{{i.user.username}}</td>
+                <td>{{i.user_ip}}</td>
+                <td>{{i.user.email}}</td>
+                <td>{{i.login_time|date:"Y-m-d H:i:s"}}</td>
+                {% if i.login_time == i.logout_time %}
+                <td>当前在线</td>
+                {%else%}
+                <td>{{i.logout_time|date:"Y-m-d H:i:s"}}</td>
+                {%endif%}
+                <td>
+                <button class="btn btn-xs btn-primary delete" type="button"  onclick="clickurl('{{i.id}}')">删除</button>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<div class="col-sm-8">
+    <ul class="pagination">
+        {{pages}}
+    </ul>
+</div>
+
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/users/del_history/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },2000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },2000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+
+
+
+
+
+
+{% endblock %}

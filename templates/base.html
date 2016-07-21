@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<meta name="description" content="Xenon Boostrap Admin Panel" />
+	<meta name="author" content="" />
+	
+	<title>资产管理系统v0.1</title>
+
+	<link rel="stylesheet" href="http://fonts.useso.com/css?family=Arimo:400,700,400italic">
+	<link rel="stylesheet" href="/static/assets/css/fonts/linecons/css/linecons.css">
+	<link rel="stylesheet" href="/static/assets/css/fonts/fontawesome/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/static/assets/css/bootstrap.css">
+	<link rel="stylesheet" href="/static/assets/css/xenon-core.css">
+	<link rel="stylesheet" href="/static/assets/css/xenon-forms.css">
+	<link rel="stylesheet" href="/static/assets/css/xenon-components.css">
+	<link rel="stylesheet" href="/static/assets/css/xenon-skins.css">
+	<link rel="stylesheet" href="/static/assets/css/custom.css">
+
+
+	<script src="/static/assets/js/jquery-1.11.1.min.js"></script>
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+		<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+		<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+	
+	
+</head>
+<body class="page-body">
+
+
+	
+	<div class="page-container"><!-- add class "sidebar-collapsed" to close sidebar by default, "chat-visible" to make chat appear always -->
+			
+		<!-- Add "fixed" class to make the sidebar fixed always to the browser viewport. -->
+		<!-- Adding class "toggle-others" will keep only one menu item open at a time. -->
+		<!-- Adding class "collapsed" collapse sidebar root elements and show only icons. -->
+		<div class="sidebar-menu toggle-others collapsed">
+			
+			<div class="sidebar-menu-inner">	
+				
+				<header class="logo-env">
+					
+					<!-- logo -->
+					<div class="logo">
+						<a href="dashboard-1.html" class="logo-collapsed">
+							<img src="/static/assets/images/logo-collapsed@2x.png" width="40" alt=""/>
+						</a>
+					</div>
+					
+					<!-- This will toggle the mobile menu and will be visible only on mobile devices -->
+					<div class="mobile-menu-toggle visible-xs">
+						<a href="#" data-toggle="user-info-menu">
+							<i class="fa-bell-o"></i>
+							<span class="badge badge-success">7</span>
+						</a>
+						
+						<a href="#" data-toggle="mobile-menu">
+							<i class="fa-bars"></i>
+						</a>
+					</div>
+								
+				</header>
+
+
+
+				<ul id="main-menu" class="main-menu">
+					<!-- add class "multiple-expanded" to allow multiple submenus to open -->
+					<!-- class "auto-inherit-active-class" will automatically add "active" class for parent elements who are marked already with class "active" -->
+					<li>
+						<a href="/">
+							<i class="fa-home"></i>
+							<span class="title">首页</span>
+						</a>
+					</li>
+					<li >
+						<a href="layout-variants.html">
+							<i class="fa-laptop"></i>
+							<span class="title">资产管理</span>
+						</a>
+
+						<ul>
+							<li>
+								<a href="{% url 'assets_list' 1 %}">
+									<span class="title">资产列表</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'assets_add' %}">
+									<span class="title">资产入库</span>
+								</a>
+							</li>
+							<li>
+								<a href="#">
+									<span class="title">资产借用</span>
+								</a>
+							</li>
+							<li>
+								<a href="#">
+									<span class="title">维修登记</span>
+								</a>
+							</li>
+							<li>
+								<a href="#">
+									<span class="title">资产报废</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+
+					<li>
+						<a href="tables-basic.html">
+							<i class="fa-tasks"></i>
+							<span class="title">资源管理</span>
+						</a>
+						<ul>
+							<li>
+								<a href="{% url 'Assets_server_list' %}">
+									<span class="title">服务器管理</span>
+								</a>
+							</li>
+							<!--
+							<li>
+								<a href="tables-responsive.html">
+									<span class="title">网络设备</span>
+								</a>
+							</li>
+							<li>
+								<a href="tables-datatables.html">
+									<span class="title">办公电脑</span>
+								</a>
+							</li>
+
+							<li>
+								<a href="tables-datatables.html">
+									<span class="title">软件管理</span>
+								</a>
+							</li>
+							-->
+						</ul>
+					</li>
+
+
+
+					<li>
+						<a href="#">
+							<i class="fa-sitemap"></i>
+							<span class="title">人员管理</span>
+						</a>
+						<ul>
+							<li>
+								<a href="{% url 'employee_list' 1 %}">
+									<span class="title">员工管理</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'jobtitle_list' %}">
+									<span class="title">职称管理</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+					<li>
+						<a href="#">
+							<i class="fa-check-square"></i>
+							<span class="title">属性设置</span>
+						</a>
+						<ul>
+							<li>
+								<a href="{% url 'idc_list' %}">
+									<span class="title">IDC管理</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'devicetype_list' %}">
+									<span class="title">设备类型</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'provider_list' %}">
+									<span class="title">提供商</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'business_list' %}">
+									<span class="title">业务管理</span>
+								</a>
+							</li>
+
+						</ul>
+					</li>
+
+
+
+
+
+					<!--用户信息设置-->
+					<li>
+						<a href="#">
+							<i class="fa-users"></i>
+							<span class="title">用户设置</span>
+						</a>
+						<ul>
+							<li>
+								<a href="{% url 'users_list' 1 %}">
+									<span class="title">用户管理</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'users_group_list' 1 %}">
+									<span class="title">用户组管理</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'dept_lists' 1 %}">
+									<span class="title">部门管理</span>
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'User_permissions'  1 %}">
+									<span class="title">权限组管理</span>
+								</a>
+							</li>
+
+							<li>
+								<a href="{% url 'users_history' 1 %}">
+									<span class="title">登录历史</span>
+								</a>
+							</li>
+						</ul>
+					</li>
+				</ul>
+						
+			</div>
+			
+		</div>
+
+		<div class="main-content">
+
+			<nav class="navbar user-info-navbar" role="navigation">
+
+				<!-- Left links for user info navbar -->
+				<ul class="user-info-menu left-links list-inline list-unstyled">
+
+					<li class="hidden-sm hidden-xs" style="min-height: 76px;">
+						<a href="#" data-toggle="sidebar">
+							<i class="fa-bars"></i>
+						</a>
+					</li>
+
+
+
+				</ul>
+
+
+				<!-- Right links for user info navbar -->
+				<ul class="user-info-menu right-links list-inline list-unstyled">
+
+					<li class="search-form" style="min-height: 76px;">
+
+						<form method="get" action="extra-search.html">
+							<input type="text" name="s" class="form-control search-field" placeholder="Type to search...">
+
+							<button type="submit" class="btn btn-link">
+								<i class="linecons-search"></i>
+							</button>
+						</form>
+
+					</li>
+
+					<li class="dropdown user-profile" style="min-height: 76px;">
+						<a href="#" data-toggle="dropdown">
+							<img src="/static{{Userprofile.photo}}" alt="user-image" class="img-circle img-inline userpic-32" width="28">
+							<span>
+								{{username}}
+								<i class="fa-angle-down"></i>
+							</span>
+						</a>
+
+						<ul class="dropdown-menu user-profile-menu list-unstyled">
+							<li>
+								<a href="{% url 'userset_password' userid %}">
+									<i class="fa-wrench"></i>
+									密码重置
+								</a>
+							</li>
+							<li>
+								<a href="{% url 'users_info' userid %}">
+									<i class="fa-user"></i>
+									用户信息
+								</a>
+							</li>
+
+							<li class="last">
+								<a href="{% url 'logout_user' %}">
+									<i class="fa-lock"></i>
+									退    出
+								</a>
+							</li>
+						</ul>
+					</li>
+
+				</ul>
+			</nav>
+
+			{% include 'panels.html' %}
+
+			{% block page-content %}
+
+			{% endblock %}
+		</div>
+	</div>
+
+	{% include 'modals.html' %}
+
+	{% block modal-content %}
+
+
+	{% endblock %}
+
+	<!-- Imported styles on this page -->
+	<link rel="stylesheet" href="/static/assets/js/datatables/dataTables.bootstrap.css">
+	<link rel="stylesheet" href="/static/assets/js/daterangepicker/daterangepicker-bs3.css">
+	<link rel="stylesheet" href="/static/assets/js/multiselect/css/multi-select.css">
+
+	<!-- Bottom Scripts -->
+	<script src="/static/assets/js/bootstrap.min.js"></script>
+	<script src="/static/assets/js/TweenMax.min.js"></script>
+	<script src="/static/assets/js/resizeable.js"></script>
+	<script src="/static/assets/js/joinable.js"></script>
+	<script src="/static/assets/js/xenon-api.js"></script>
+	<script src="/static/assets/js/xenon-toggles.js"></script>
+	<script src="/static/assets/js/multiselect.min.js"></script>
+	<script src="/static/assets/js/toastr/toastr.min.js"></script>
+	<script src="/static/assets/js/jquery-validate/jquery.validate.min.js"></script>
+	<script src="/static/assets/js/jquery-form.js"></script>
+
+
+
+
+
+	<script src="/static/assets/js/datepicker/bootstrap-datepicker.js"></script>
+	<script src="/static/assets/js/datepicker/datepicker_zh.js"></script>
+
+
+	<!-- JavaScripts initializations and stuff -->
+	<script src="/static/assets/js/xenon-custom.js"></script>
+</body>
+</html>

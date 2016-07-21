@@ -1,0 +1,325 @@
+{% extends 'base.html' %}
+
+{% block page-content %}
+
+
+<div class="col-lg-12">
+    <p>
+        <a href="javascript:;" onclick="jQuery('#modal-idcadd').modal('show', {backdrop: 'static'});">
+            <button class="btn btn-info" type="button">添加IDC</button>
+        </a>
+    </p>
+</div>
+
+<div class="col-sm-9">
+
+    <div class="panel panel-default">
+        <strong>IDC列表</strong>
+        <table class="table table-hover">
+            <thead>
+            <tr>
+
+                <th>IDC</th>
+                <th>地址</th>
+                <th>楼层</th>
+                <th>联系人</th>
+                <th>联系方式</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for idc in IDCdata %}
+            <tr>
+                <td>{{ idc.idc_name}}</td>
+                <td>{{ idc.address}}</td>
+                <td>{{ idc.floor}}</td>
+                <td>{{ idc.contacts}}</td>
+                <td>{{ idc.phone}}</td>
+                <td>
+                    <a class="btn btn-xs btn-info"  onclick="PostIdcEdit('{{ idc.id}}')"  >编辑</a>
+                    <a class="btn btn-xs btn-primary "  onclick="clickurl('{{idc.id}}')">删除</a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script type="text/javascript">
+       function PostIdcAdd(){
+               $("form#idcadd").validate({
+                        rules: {
+                            idcname: {
+                                required: true
+                            },
+                        },
+                        messages: {
+                            idcname: {
+                                required: '请输入idc名称'
+                            },
+                        },
+                        // 添加用户信息
+                        submitHandler: function()
+                        {
+                             $.ajax({
+                                url: "{% url "idc_list" %}",
+                                method: 'POST',
+                                dataType: 'json',
+                                data: {
+                                     idcname: $("input[name='idcname']").val(),
+                                     address: $("input[name='address']").val(),
+                                     floor: $("input[name='floor']").val(),
+                                     contacts: $("input[name='contacts']").val(),
+                                     phone: $("input[name='phone_number']").val(),
+                                     csrfmiddlewaretoken: '{{ csrf_token }}',
+                                },
+                                success: function(resp)
+                                {
+                                    var msginfo = resp.msginfo;
+                                    var msgerror = resp.msgerror;
+                                    if (msginfo){
+                                        toastr.success(msginfo);
+                                        //关闭模态框
+                                        $('#modal-idcadd').modal('hide');
+                                        setTimeout(function() {
+                                            location.href = location.href;
+                                        },1000);
+                                    }
+                                    else{
+                                        $('#modal-idcadd').modal('hide');
+                                        toastr.error(msgerror);
+                                    }
+                                },
+                                error: function() {
+                                    toastr.error("网络异常");
+                                }
+                                });
+
+                        }
+               });
+        }
+
+</script>
+
+<script type="text/javascript">
+    function PostIdcEdit(idcid){
+        $(function(){
+            $.ajax({
+                        url: "/assets/idc/idcedit/" + idcid,
+                        method: "GET",
+                        dataType: 'json',
+                        success: function(resp)
+                        {
+                          var msgerror = resp.msgerror;
+                          if (msgerror){
+
+                                toastr.error(msgerror);
+                          }
+                          else{
+                              document.getElementById('idcname_edit').value = resp.idcname;
+                              document.getElementById('address_edit').value = resp.address;
+                              document.getElementById('floor_edit').value = resp.floor;
+                              document.getElementById('contacts_edit').value = resp.contacts;
+                              document.getElementById('phone_number_edit').value = resp.phone;
+                              document.getElementById('idcname_edit').setAttribute('idcid',resp.tag);
+                              $('#modal-idcedit').modal('show');
+                          }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+            });
+        });
+    }
+
+</script>
+
+<script type="text/javascript">
+    //修改组名的请求
+    function idc_edit_info(){
+        var id = document.getElementById('idcname_edit').attributes['idcid'].value;
+        $.ajax({
+                url: "/assets/idc/idcedit/" + id,
+                method: 'POST',
+                dataType: 'json',
+                data: {
+                    idcname_edit:  document.getElementById('idcname_edit').value,
+                    address_edit:  document.getElementById('address_edit').value,
+                    floor_edit:  document.getElementById('floor_edit').value,
+                    contacts_edit:  document.getElementById('contacts_edit').value,
+                    phone_number_edit:  document.getElementById('phone_number_edit').value,
+                    csrfmiddlewaretoken: '{{ csrf_token }}',
+                },
+                success: function(resp){
+                    var msginfo = resp.msginfo;
+                    var msgerror = resp.msgerror;
+                    if (msginfo){
+                        toastr.success(msginfo);
+                        $('#modal-idcedit').modal('hide');
+                        setTimeout(function() {
+                            location.href = location.href;
+                        },1000);
+                    }
+                    else{
+                         toastr.error(msgerror);
+                    }
+                },
+                error: function(){
+                    toastr.error("网络异常");
+                },
+        });
+    }
+</script>
+<!-- 删除信息确认-->
+<script type="text/javascript">
+    function clickurl(url_id){
+        $(function(){
+            $('#modal-delinfo').modal('show');
+            $('#delete_this').click(function(){
+                $.ajax({
+                        url: "/assets/idc/delete/" + url_id,
+                        method: "GET",
+                        dataType: 'json',
+
+                        success: function(resp)
+                        {
+                            var msginfo = resp.msginfo;
+                            var msgerror = resp.msgerror;
+                            if (msginfo){
+                                toastr.success(msginfo);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },1000);
+                            }
+                            else{
+                                toastr.error(msgerror);
+                                $('#modal-delinfo').modal('hide');
+                                setTimeout(function() {
+                                    location.href = location.href;
+                                },3000);
+                            }
+                        },
+                        error: function() {
+                            toastr.error("网络异常");
+                        }
+                });
+
+            });
+
+        });
+    }
+
+</script>
+{% endblock %}
+
+
+{% block modal-content %}
+    <div class="modal fade" id="modal-idcadd">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form method="post" role="form" id="idcadd" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">IDC添加</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">IDC</label>
+
+                                    <input type="text" class="form-control" id="idcname" name="idcname">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">地址</label>
+
+                                    <input type="text" class="form-control" id="address" name="address">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">楼层</label>
+
+                                    <input type="text" class="form-control" id="floor" name="floor">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系人</label>
+
+                                    <input type="text" class="form-control" id="contacts" name="contacts">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系方式</label>
+                                    <input type="text" class="form-control"  name="phone_number">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                            <button type="submit" class="btn btn-info" onclick="PostIdcAdd()">添加</button>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="modal-idcedit">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">IDC信息修改</h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">IDC</label>
+
+                                    <input type="text" class="form-control" id="idcname_edit" name="idcname_edit">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">地址</label>
+
+                                    <input type="text" class="form-control" id="address_edit" name="address_edit">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">楼层</label>
+                                    <input type="text" class="form-control" id="floor_edit" name="floor_edit">
+                                </div>
+
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系人</label>
+
+                                    <input type="text" class="form-control" id="contacts_edit" name="contacts_edit">
+                                </div>
+                                <div class="form-group-separator"></div>
+                                <div class="form-group">
+                                    <label for="field-1" class="control-label">联系方式</label>
+                                    <input type="text" class="form-control" id="phone_number_edit" name="phone_number_edit">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-white" data-dismiss="modal">取消</button>
+                        <button type="submit" class="btn btn-info" onclick="idc_edit_info()">添加</button>
+                    </div>
+                </div>
+        </div>
+    </div>
+{% endblock %}
